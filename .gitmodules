@@ -1,0 +1,6 @@
+[submodule "libs/arduinolibs"]
+        path = libs/arduinolibs
+        url = https://github.com/rweather/arduinolibs
+[submodule "libs/Entropy"]
+        path = libs/Entropy
+        url = https://github.com/pmjdebruijn/Arduino-Entropy-Library
