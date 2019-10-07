@@ -22,6 +22,7 @@ namespace MqttModule
             MeshMqttClient(IEncryptedMesh & mesh, SubscriberList & subscribers, uint16_t nodeId = 0);
             bool publish(const MqttMessage & message);
             bool publish(const char * topic, unsigned long number);
+            bool publish(const char * topic, const char * message);
             bool publish(const char * topic, uint16_t number);
             bool subscribe(const char * topic, IMessageHandler * handler);
             size_t loop();

@@ -24,7 +24,7 @@ g++ $mocksOptions $options $mockPath/Arduino.cpp
 g++ $mocksOptions $options $mockPath/fake_serial.cpp
 
 if [[ ! -f main.o ]]; then
-    g++ $testOptions $options $testPath/../main.cpp
+    g++ $testOptions $options $testPath/main.cpp
 fi
 
 g++ $mocksOptions $libOptions $srcOptions $options $srcPath/MqttModule/SubscriberList.cpp

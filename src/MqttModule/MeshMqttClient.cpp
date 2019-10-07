@@ -33,6 +33,12 @@ bool MeshMqttClient::publish(const char * topic, unsigned long value)
     return publish(message);
 }
 
+bool MeshMqttClient::publish(const char * topic, const char * msg)
+{
+    MqttMessage message(topic, msg);
+    return publish(message);
+}
+
 bool MeshMqttClient::subscribe(const char * topic, IMessageHandler * handler)
 {
     subscribers.add(topic, handler, mesh.getNodeId());

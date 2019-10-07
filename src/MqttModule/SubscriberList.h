@@ -25,8 +25,8 @@ namespace MqttModule
         //c++11 requires constuctor
         Subscriber(uint32_t topicCrc, IMessageHandler * handler, uint16_t node): topicCrc(topicCrc), handlerSize(1)
         {
-        handlers[0] = handler;
-        nodes[0] = node;
+            handlers[0] = handler;
+            nodes[0] = node;
         }
     };
 
@@ -48,7 +48,6 @@ namespace MqttModule
             Subscriber * getSubscribed(const char * topic);
             size_t subscriberSize {0};
             Subscriber subscribers[MAX_SUBSCRIBERS];
-            
     };
 }
 
