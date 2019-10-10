@@ -38,7 +38,7 @@ class MessageHandler: public IMessageHandler
         void handle(const char * channel, const char * message)
         {
             Serial.println("Received new message:");
-            Serial.println(topic);
+            Serial.println(channel);
             Serial.println(message);
         }
 };
