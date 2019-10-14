@@ -2,7 +2,7 @@
 #define RADIO_ENCRYPTED_HELPERS
 
 #include <RF24Mesh.h>
-#include <Streaming>
+#include <Streaming.h>
 
 namespace RadioEncrypted
 {
@@ -27,3 +27,5 @@ namespace RadioEncrypted
     }
 
 }
+
+#endif
