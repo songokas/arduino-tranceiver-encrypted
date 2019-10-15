@@ -3,7 +3,7 @@
 
 #include <Arduino.h>
 #include "CommonModule/MacroHelper.h"
-#include "RadioEncrypted/RadioEncryptedConfig.h"
+#include "MqttConfig.h"
 
 namespace MqttModule
 {
