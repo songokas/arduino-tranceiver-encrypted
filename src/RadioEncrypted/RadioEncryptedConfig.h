@@ -3,12 +3,8 @@
 
 #include <Arduino.h>
 
-// mqtt topic
-const uint8_t MAX_LEN_TOPIC {70};
-// mqtt message
-const uint8_t MAX_LEN_MESSAGE {80};
-
 // encrypted message cipher text lenth
+// does not work above 100 why ?
 const uint8_t MAX_LEN_ENCRYPTED_MESSAGE (MAX_LEN_TOPIC + MAX_LEN_MESSAGE);
 
 const uint8_t KEY_LENGH {16};

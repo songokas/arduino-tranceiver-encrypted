@@ -22,6 +22,11 @@
 #define MAX_PROVIDERS 4
 #endif
 
+// mqtt topic
+const uint8_t MAX_LEN_TOPIC {60};
+// mqtt message
+const uint8_t MAX_LEN_MESSAGE {40};
+
 const char CHANNEL_SUBSCRIBE[] PROGMEM {NODE_NAME "/subscribe"};
 const char CHANNEL_INFO[] PROGMEM {NODE_NAME "/%s/%d"};
 const char CHANNEL_SET_JSON[] PROGMEM {NODE_NAME "/set/json"};
