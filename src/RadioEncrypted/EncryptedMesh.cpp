@@ -1,3 +1,4 @@
+#include <avr/wdt.h>
 #include <RF24.h>
 #include <RF24Network.h>
 #include <RF24Mesh.h>
@@ -41,6 +42,7 @@ bool EncryptedMesh::send(const void * data, size_t len, uint8_t messageType, uin
     #endif
 
 	while (retries > 0) {
+	    wdt_reset();
 	    if (mesh.write(&message, messageType, sizeof(message), toNodeId)) {
             return true;
 	    } else {
@@ -63,15 +65,23 @@ bool EncryptedMesh::receive(void * data, size_t len, uint8_t messageType, RF24Ne
             return false;
         }
 
-        MeshAuth auth {mesh.getNodeID(header.from_node), getNodeId(), header.type};
+        int16_t nodeId = mesh.getNodeID(header.from_node);
+        if (nodeId < 0) {
+            DPRINTLN(F("Cant verify node id in netork"));
+            return false;
+        }
+
+        MeshAuth auth {(uint16_t)nodeId, getNodeId(), header.type};
 
 #ifdef DEBUG_NETWORK
         DPRINTLN(F("Received encrypted message"));
         printBytes(&message, sizeof(message));
+        DPRINTLN(bytesRead);
         DPRINTLN(F("Auth header"));
         printBytes(&auth, sizeof(auth));
-        DPRINTLN(bytesRead);
         DPRINTLN(auth.fromNode);
+        DPRINTLN(auth.toNode);
+        DPRINTLN(auth.messageType);
         DPRINTLN(header.toString());
 #endif
 
