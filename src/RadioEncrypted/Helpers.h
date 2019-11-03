@@ -20,8 +20,7 @@ namespace RadioEncrypted
                 return true;
             }
         } else {
-            return true;
-            /*wdt_reset();
+            wdt_reset();
             auto currentAddress = mesh.getAddress(mesh.getNodeID());
             if (!(currentAddress > 0)) {
                 Serial << F("Renew address: ") << currentAddress << endl;
@@ -29,7 +28,7 @@ namespace RadioEncrypted
                 return mesh.renewAddress(MESH_TIMEOUT);
             } else {
                 return true;
-            }*/
+            }
         }
         return false;
     }
