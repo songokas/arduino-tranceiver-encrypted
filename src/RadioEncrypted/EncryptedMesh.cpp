@@ -53,7 +53,7 @@ bool EncryptedMesh::send(const void * data, size_t len, uint8_t messageType, uin
     return false;
 }
 
-bool EncryptedMesh::receive(void * data, size_t len, uint8_t messageType, RF24NetworkHeader & header)
+bool EncryptedMesh::receive(void * data, size_t len, uint8_t messageType, RF24NetworkHeader & header, uint8_t expectFromAddress)
 {
     network.peek(header);
 
@@ -65,7 +65,7 @@ bool EncryptedMesh::receive(void * data, size_t len, uint8_t messageType, RF24Ne
             return false;
         }
 
-        int16_t nodeId = mesh.getNodeID(header.from_node);
+        int16_t nodeId = expectFromAddress ? expectFromAddress : mesh.getNodeID(header.from_node);
         if (nodeId < 0) {
             DPRINTLN(F("Cant verify node id in netork"));
             return false;

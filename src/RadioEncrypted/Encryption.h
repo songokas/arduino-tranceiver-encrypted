@@ -21,7 +21,6 @@ namespace RadioEncrypted
     };
 #pragma pack (0)
 
-
     class Encryption
     {
         public:
