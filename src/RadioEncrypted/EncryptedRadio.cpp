@@ -16,7 +16,7 @@ EncryptedRadio::EncryptedRadio(uint8_t nodeId, RF24 & radio, Encryption & encryp
     :nodeId(nodeId), radio(radio), encryption(encryption)
 {}
 
-bool EncryptedRadio::send(const void * data, size_t len, uint8_t messageType, uint16_t toNodeId, uint8_t retries)
+bool EncryptedRadio::send(const void * data, size_t len, uint8_t messageType, uint16_t toNodeId, uint8_t retries, uint16_t fallBackNode)
 {
     if  (isAvailable()) {
         DPRINTLN(F("Packet is available. Read it first"));
@@ -43,8 +43,17 @@ bool EncryptedRadio::send(const void * data, size_t len, uint8_t messageType, ui
         DPRINTLN(auth.messageType);
     #endif
 
+    bool result = sendToNode(radioMessage, toNodeId);
+    if (!result && fallBackNode > 0) {
+        result = sendToNode(radioMessage, fallBackNode);
+    }
+    return result;
+}
+
+bool EncryptedRadio::sendToNode(const RadioEncryptedMessage & radioMessage, uint16_t toNode, uint8_t retries)
+{
     radio.stopListening();
-    uint8_t address[6] = {toNodeId, 0, 0, 0, 0, 0};
+    uint8_t address[6] = {toNode, 0, 0, 0, 0, 0};
     radio.openWritingPipe(address);
 	while (retries > 0) {
 	    wdt_reset();
@@ -60,7 +69,7 @@ bool EncryptedRadio::send(const void * data, size_t len, uint8_t messageType, ui
     return false;
 }
 
-bool EncryptedRadio::receive(void * data, size_t len, uint8_t messageType, RF24NetworkHeader & header, uint8_t expectFromAddress = 0)
+bool EncryptedRadio::receive(void * data, size_t len, uint8_t messageType, RF24NetworkHeader & header, uint8_t expectFromAddress)
 {
     RadioEncryptedMessage radioMessage;
     radio.read(&radioMessage, sizeof(radioMessage));
@@ -72,6 +81,11 @@ bool EncryptedRadio::receive(void * data, size_t len, uint8_t messageType, RF24N
     header.from_node = expectFromAddress > 0 ? expectFromAddress : radioMessage.header.fromNode;
     header.to_node = radioMessage.header.toNode;
     header.type = radioMessage.header.messageType;
+
+    if (radioMessage.header.toNode != nodeId) {
+        DPRINT(F("Forward to node ")); DPRINTLN(radioMessage.header.toNode);
+        return sendToNode(radioMessage, radioMessage.header.toNode);
+    }
 
     if (encryption.decrypt(&radioMessage.header, sizeof(radioMessage.header), radioMessage.message, data, len)) {
         return true;
