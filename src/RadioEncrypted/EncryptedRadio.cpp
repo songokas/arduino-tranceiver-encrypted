@@ -35,10 +35,12 @@ bool EncryptedRadio::send(const void * data, size_t len, uint8_t messageType, ui
 
     #ifdef DEBUG_NETWORK
         DPRINTLN(F("Send encrypted message"));
-        printBytes(&message, sizeof(message));
+        printBytes(&radioMessage, sizeof(radioMessage));
         DPRINTLN(F("Auth header"));
         printBytes(&auth, sizeof(auth));
-        DPRINTLN(sizeof(message));
+        DPRINTLN(auth.fromNode);
+        DPRINTLN(auth.toNode);
+        DPRINTLN(auth.messageType);
     #endif
 
     radio.stopListening();

@@ -17,7 +17,7 @@ namespace RadioEncrypted
     {
         uint8_t nonce[VECTOR_LENGH] {0};
         uint8_t cipherText[MAX_LEN_ENCRYPTED_MESSAGE] {0};
-        uint8_t tag[VECTOR_LENGH] {0};
+        uint8_t tag[MAX_TAG_LENGH] {0};
     };
 #pragma pack (0)
 
