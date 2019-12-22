@@ -58,7 +58,7 @@ bool EncryptedRadio::send(const void * data, size_t len, uint8_t messageType, ui
     return false;
 }
 
-bool EncryptedRadio::receive(void * data, size_t len, uint8_t messageType, RF24NetworkHeader & header)
+bool EncryptedRadio::receive(void * data, size_t len, uint8_t messageType, RF24NetworkHeader & header, uint8_t expectFromAddress = 0)
 {
     RadioEncryptedMessage radioMessage;
     radio.read(&radioMessage, sizeof(radioMessage));
@@ -67,7 +67,7 @@ bool EncryptedRadio::receive(void * data, size_t len, uint8_t messageType, RF24N
         return false;
     }
 
-    header.from_node = radioMessage.header.fromNode;
+    header.from_node = expectFromAddress > 0 ? expectFromAddress : radioMessage.header.fromNode;
     header.to_node = radioMessage.header.toNode;
     header.type = radioMessage.header.messageType;
 
