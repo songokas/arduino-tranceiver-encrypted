@@ -8,7 +8,7 @@ namespace MqttModule
     class PinCollection
     {
         public:
-            PinCollection(Pin * pins, uint8_t len);
+            PinCollection(Pin * pins, uint8_t pinArrLength);
 
             bool hasAvailablePin(uint8_t pin) const;
 
@@ -19,7 +19,7 @@ namespace MqttModule
         //@TODO implement iterator
         private:
             Pin * pins {nullptr};
-            uint8_t len {0};
+            uint8_t pinArrLength {0};
     };
 }
 #endif

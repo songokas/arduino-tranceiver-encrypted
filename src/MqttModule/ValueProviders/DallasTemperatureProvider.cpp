@@ -25,7 +25,7 @@ bool DallasTemperatureProvider::formatMessage(char * message, size_t len, const 
     }
     sensor.requestTemperatures();
     float temp = sensor.getTempCByIndex(0);
-    snprintf_P(message, len, PSTR("%.2f"), temp);
+    snprintf_P(message, len, PSTR("%ul"), (uint16_t)(100 * temp));
     return true;
 }
 

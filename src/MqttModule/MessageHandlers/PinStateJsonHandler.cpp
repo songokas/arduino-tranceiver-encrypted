@@ -67,7 +67,7 @@ uint8_t PinStateJsonHandler::assignPin(const JsonObject & json)
     }
 
     const char * type = json[F("type")].is<const char *>() ? json[F("type")].as<const char *>() : nullptr;
-    uint16_t pinType = valueProviderFactory.getMatchingPinType(type, strlen(type));
+    const char * pinType = valueProviderFactory.getMatchingPinType(type, strlen(type));
 
     Pin pin {
         id,

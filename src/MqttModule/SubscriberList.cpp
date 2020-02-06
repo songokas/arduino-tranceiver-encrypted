@@ -9,12 +9,16 @@
 using MqttModule::Subscriber;
 using MqttModule::SubscriberList;
 
+SubscriberList::SubscriberList(Subscriber * subscribers, uint8_t subscriberArrLength)
+    : subscribers(subscribers), subscriberArrLength(subscriberArrLength)
+{}
+
 Subscriber * SubscriberList::getSubscribed(const char * topic)
 {
     uint32_t crc = CRC32::calculate(topic, strlen(topic));
-    for (auto & sub: subscribers) {
-        if (sub.topicCrc == crc) {
-            return &sub;
+    for (uint8_t i = 0; i < subscriberSize; i++) {
+        if (subscribers[i].topicCrc == crc) {
+            return &subscribers[i];
         }
     }
     return nullptr;
@@ -43,12 +47,15 @@ bool SubscriberList::add(const char * topic, IMessageHandler * handler, uint16_t
 
     Subscriber * sub = getSubscribed(topic);
     if (sub == nullptr) {
-        if (subscriberSize >= COUNT_OF(subscribers)) {
+        if (subscriberSize >= subscriberArrLength) {
             return false;
         }
 
         uint32_t crc = CRC32::calculate(topic, strlen(topic));
-        subscribers[subscriberSize] = Subscriber(crc, handler, nodeId);
+        subscribers[subscriberSize].topicCrc = crc;
+        subscribers[subscriberSize].handlers[0] = handler;
+        subscribers[subscriberSize].nodes[0] = nodeId;
+        subscribers[subscriberSize].handlerSize++;
         subscriberSize++;
         return true;
     }
@@ -64,19 +71,14 @@ bool SubscriberList::add(const char * topic, IMessageHandler * handler, uint16_t
         return handlerAdded;
     }
     
-    for (auto & node: sub->nodes) {
-        if (node == 0) {
-            node = nodeId;
+    for (uint8_t i = 0; i < sub->nodeArrLength; i++) {
+        if (sub->nodes[i] == 0) {
+            sub->nodes[i] = nodeId;
             return true;
         }
     }
     return false;
 }
-
-/*bool SubscriberList::add(const Subscriber & subscriber)
-{
-    return add(subscriber.topic, subscriber.handlers[0], subscriber.nodes[0]);
-}*/
 
 size_t SubscriberList::countSubscribers() const
 {
@@ -107,8 +109,8 @@ bool SubscriberList::hasHandler(const char * topic, IMessageHandler * handler)
 
 bool SubscriberList::hasNode(const Subscriber & subscriber, uint16_t nodeId)
 {
-   for (auto node: subscriber.nodes) {
-        if (node == nodeId) {
+    for (uint8_t i = 0; i < subscriber.nodeArrLength; i++) {
+        if (subscriber.nodes[i] == nodeId) {
             return true;
         }
     }

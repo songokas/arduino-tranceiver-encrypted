@@ -1,10 +1,15 @@
 #include <Arduino.h>
+#include <Streaming.h>
 #include "../MqttConfig.h"
 #include "ValueProviderFactory.h"
 
 using MqttModule::ValueProviders::ValueProviderFactory;
 using MqttModule::Pin;
 using MqttModule::ValueProviders::IValueProvider;
+
+ValueProviderFactory::ValueProviderFactory(IValueProvider ** providers, uint8_t providerArrLength)
+    :providers(providers), providerArrLength(providerArrLength)
+{}
 
 const char * ValueProviderFactory::getMatchingTopicType(const Pin & pin) const
 {
@@ -15,13 +20,13 @@ const char * ValueProviderFactory::getMatchingTopicType(const Pin & pin) const
     return provider->getPinType();
 }
 
-bool ValueProviderFactory::formatMessage(char * topic, size_t len, const Pin & pin)
+bool ValueProviderFactory::formatMessage(char * message, size_t len, const Pin & pin)
 {
     IValueProvider * provider = getProvider(pin);
     if (!provider) {
         return false;
     }
-    return provider->formatMessage(topic, len, pin);
+    return provider->formatMessage(message, len, pin);
 }
 
 bool ValueProviderFactory::apply(const Pin & pin)
@@ -33,27 +38,15 @@ bool ValueProviderFactory::apply(const Pin & pin)
     return provider->apply(pin);
 }
 
-void ValueProviderFactory::addByType(uint16_t type, IValueProvider * provider, uint8_t pin)
-{
-    //c++11 issue
-    //providers[getFreeIndex()] = {pin, type, provider};
-    uint8_t index = getFreeIndex();
-    providers[index].pin = pin;
-    providers[index].type = type;
-    providers[index].provider = provider;
-}
 
-uint16_t ValueProviderFactory::getMatchingPinType(const char * type, size_t len) const
+const char * ValueProviderFactory::getMatchingPinType(const char * type, size_t length) const
 {
-    for (const auto & q: providers) {
-        if (q.provider == nullptr) {
-            continue;
-        }
-        if (strncmp(q.provider->getPinType(), type, len)) {
-            return q.type;
+    for (uint8_t i = 0; i < providerArrLength; i++) {
+        if (strncmp(providers[i]->getPinType(), type, length)) {
+            return providers[i]->getPinType();
         }
     }
-    return 0;
+    return nullptr;
 }
 
 const char * ValueProviderFactory::getPinType() const
@@ -63,27 +56,10 @@ const char * ValueProviderFactory::getPinType() const
 
 IValueProvider * ValueProviderFactory::getProvider(const Pin & pin) const
 {
-    for (const auto & q: providers) {
-        if (q.pin == pin.id) {
-            return q.provider;
-        }
-    }
-    for (const auto & q: providers) {
-        if (q.type == pin.type) {
-            return q.provider;
+    for (uint8_t i = 0; i < providerArrLength; i++) {
+        if (strcmp(providers[i]->getPinType(), pin.type)) {
+            return providers[i];
         }
     }
     return nullptr;
-}
-
-uint8_t ValueProviderFactory::getFreeIndex() const
-{
-    uint8_t index = 0;
-    for (const auto & q: providers) {
-        if (q.pin == 0 && q.type == 0) {
-            return index;
-        }
-        index++;
-    }
-    return index;
 }

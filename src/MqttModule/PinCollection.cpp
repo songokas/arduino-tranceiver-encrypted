@@ -5,17 +5,16 @@
 
 using MqttModule::PinCollection;
 
-PinCollection::PinCollection(Pin * pins, uint8_t len)
-    :pins(pins), len(len)
+PinCollection::PinCollection(Pin * pins, uint8_t pinArrLength)
+    :pins(pins), pinArrLength(pinArrLength)
 {}
 
 bool PinCollection::set(const Pin & pin)
 {
-    for (uint8_t i = 0; i < len; i++) {
+    for (uint8_t i = 0; i < pinArrLength; i++) {
         if (pins[i].id == pin.id) {
-            Pin & p = pins[i];
-            p.value = pin.value;
-            p.readInterval = p.readInterval;
+            pins[i].value = pin.value;
+            pins[i].readInterval = pin.readInterval;
             return true;
         }
     }
@@ -24,7 +23,7 @@ bool PinCollection::set(const Pin & pin)
 
 bool PinCollection::hasAvailablePin(uint8_t id) const
 {
-    for (uint8_t i = 0; i < len; i++) {
+    for (uint8_t i = 0; i < pinArrLength; i++) {
         if (pins[i].id == id) {
             return true;
         }
@@ -34,10 +33,9 @@ bool PinCollection::hasAvailablePin(uint8_t id) const
 
 bool PinCollection::isReadOnly(uint8_t id) const
 {
-    for (uint8_t i = 0; i < len; i++) {
+    for (uint8_t i = 0; i < pinArrLength; i++) {
         if (pins[i].id == id) {
-            Pin & pin = pins[i];
-            return pin.readOnly;
+            return pins[i].readOnly;
         }
     }
     return false;

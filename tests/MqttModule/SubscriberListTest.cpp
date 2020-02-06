@@ -9,13 +9,19 @@
 
 using MqttModule::MqttMessage;
 using MqttModule::SubscriberList;
+using MqttModule::Subscriber;
 using MqttModule::MessageHandlers::IMessageHandler;
 
 using namespace fakeit;
 
 TEST_CASE( "subscribtion add", "[subscriber]" ) {
 
-    SubscriberList list;
+    IMessageHandler * handlers1[] {nullptr, nullptr};
+    IMessageHandler * handlers2[] {nullptr, nullptr};
+    uint16_t nodes1[] {0, 0};
+    uint16_t nodes2[] {0, 0};
+    Subscriber subs[] { {handlers1, COUNT_OF(handlers1), nodes1, COUNT_OF(nodes1)}, {handlers2, COUNT_OF(handlers2), nodes2, COUNT_OF(nodes2)}};
+    SubscriberList list (subs, COUNT_OF(subs));
 
     SECTION( "add subscribers" ) {
         Mock<IMessageHandler> handler1;

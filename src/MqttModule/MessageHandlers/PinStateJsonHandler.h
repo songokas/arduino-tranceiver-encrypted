@@ -19,7 +19,6 @@ namespace MqttModule
         {
 
             public:
-
                 PinStateJsonHandler(PinCollection & pins, ValueProviderFactory & valueProviderFactory);
 
                 void handle(const char * channel, const char * message);

@@ -54,7 +54,7 @@ void PinStateHandler::handle(const char * channel, const char * message)
     //bool isAnalog = strncmp("analog", channel + typePos + 1, 6) == 0;
     bool isReadOperation = strncmp("read", channel + operationPos + 1, 4) == 0;
 
-    uint16_t pinType = valueProviderFactory.getMatchingPinType(channel + typePos + 1, 6);
+    const char * pinType = valueProviderFactory.getMatchingPinType(channel + typePos + 1, 6);
     uint16_t value = atoi(message);
 
     Pin pin {id, pinType, isSetOperation ? value : 0, false, isReadOperation ? value : DEFAULT_PIN_READ_TIME, 0};

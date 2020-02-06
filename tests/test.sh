@@ -9,7 +9,7 @@ fi
 cd build
 
 mockPath="../Mocks/";
-options="-c -g -std=gnu++14"
+options="-c -g -std=c++14"
 srcPath="../../src"
 libPath="../../libs"
 testPath="../"

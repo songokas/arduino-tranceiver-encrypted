@@ -40,7 +40,7 @@ TEST_CASE( "encryption tests", "[encryption]" ) {
     SECTION ( "test encryption" ) {
         EncryptedMessage msg {"random random n"};
 
-        const char testData[] = "test data 123";
+        const char testData[] = "test";
         const char authData[] = "test auth data 123";
         
         REQUIRE(msg.cipherText[0] == 0);

@@ -14,30 +14,27 @@ namespace MqttModule
 
     struct Subscriber
     {
-        uint32_t topicCrc {0};
-        //char topic[MAX_LEN_TOPIC] {0};
-        IMessageHandler * handlers [MAX_HANDLERS_PER_TOPIC] {nullptr};
-        size_t handlerSize {0};
-        uint16_t nodes[MAX_NODES_PER_TOPIC] {0};
+        IMessageHandler ** handlers {nullptr};
+        uint8_t handlerArrLength {0};
+        uint16_t * nodes {nullptr};
+        uint8_t nodeArrLength {0};
         
-        Subscriber() {}
-
-        //c++11 requires constuctor
-        Subscriber(uint32_t topicCrc, IMessageHandler * handler, uint16_t node): topicCrc(topicCrc), handlerSize(1)
-        {
-            handlers[0] = handler;
-            nodes[0] = node;
-        }
+        uint32_t topicCrc {0};
+        uint8_t handlerSize {0};
+        
+        Subscriber(IMessageHandler ** handlers, uint8_t handlerArrLength, uint16_t * nodes, uint8_t nodeArrLength)
+            : handlers(handlers), handlerArrLength(handlerArrLength), nodes(nodes), nodeArrLength(nodeArrLength)
+        {}
     };
 
 
     class SubscriberList
     {
         public:
+            SubscriberList(Subscriber * subscribers, uint8_t subscriberArrLength);
             bool hasSubscribed(const char * topic);
             size_t call(const MqttMessage & message);
             bool add(const char * topic, IMessageHandler * handler, uint16_t nodeId);
-            //bool add(const Subscriber & subscriber);
             size_t countSubscribers() const;
             size_t countHandlers(const char * topic);
             bool hasHandler(const char * topic, IMessageHandler * handler);
@@ -45,9 +42,11 @@ namespace MqttModule
 
         private:
             bool hasNode(const Subscriber & subscriber, uint16_t nodeId);
+
             Subscriber * getSubscribed(const char * topic);
-            size_t subscriberSize {0};
-            Subscriber subscribers[MAX_SUBSCRIBERS];
+            Subscriber * subscribers;
+            uint8_t subscriberArrLength {0};
+            uint8_t subscriberSize {0};
     };
 }
 
