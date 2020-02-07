@@ -42,7 +42,7 @@ bool ValueProviderFactory::apply(const Pin & pin)
 const char * ValueProviderFactory::getMatchingPinType(const char * type, size_t length) const
 {
     for (uint8_t i = 0; i < providerArrLength; i++) {
-        if (strncmp(providers[i]->getPinType(), type, length)) {
+        if (strncmp(providers[i]->getPinType(), type, length) == 0) {
             return providers[i]->getPinType();
         }
     }
@@ -56,8 +56,11 @@ const char * ValueProviderFactory::getPinType() const
 
 IValueProvider * ValueProviderFactory::getProvider(const Pin & pin) const
 {
+    if (pin.type == nullptr) {
+        return nullptr;
+    }
     for (uint8_t i = 0; i < providerArrLength; i++) {
-        if (strcmp(providers[i]->getPinType(), pin.type)) {
+        if (strcmp(providers[i]->getPinType(), pin.type) == 0) {
             return providers[i];
         }
     }

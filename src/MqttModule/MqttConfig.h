@@ -31,7 +31,7 @@ namespace MqttModule
         uint8_t id {0};
         const char * type {nullptr};
         uint16_t value {0};
-        bool readOnly {false};
+        bool readOnly {true};
         uint16_t readInterval {DEFAULT_PIN_READ_TIME};
         unsigned long lastRead {0};
 
