@@ -73,7 +73,7 @@ namespace MqttModule
             Subscriber & getSubscriberByIndex(uint8_t i) { return i >= maxSubscribers ? subscribers[maxSubscribers - 1] : subscribers[i]; }
             const Subscriber & getSubscriberByIndex(uint8_t i) const { return i >= maxSubscribers ? subscribers[maxSubscribers - 1] : subscribers[i]; };
         private:
-            StaticSubscriber<maxHandlers, maxNodes> subscribers[maxSubscribers] {};
+            StaticSubscriber<maxHandlers, maxNodes> subscribers[maxSubscribers];
     };
 }
 

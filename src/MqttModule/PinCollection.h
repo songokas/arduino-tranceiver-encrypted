@@ -32,7 +32,7 @@ namespace MqttModule
             const Pin * getPin(uint8_t id) const { for (const auto & pin: pins) { if (pin.id == id) { return &pin; } } return nullptr; }
 
         private:
-            Pin pins[maxPins] {};
+            Pin pins[maxPins];
     };
 }
 #endif
