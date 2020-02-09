@@ -22,3 +22,8 @@ const char * DigitalProvider::getPinType() const
 {
     return "digital";
 }
+
+bool DigitalProvider::addJson(JsonDocument & json, const Pin & pin)
+{
+    json[F("digital")] = digitalRead(pin.id);
+}

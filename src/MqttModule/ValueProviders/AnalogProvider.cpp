@@ -22,3 +22,8 @@ const char * AnalogProvider::getPinType() const
 {
     return "analog";
 }
+
+bool AnalogProvider::addJson(JsonDocument & json, const Pin & pin)
+{
+    json[F("analog")] = analogRead(pin.id);
+}

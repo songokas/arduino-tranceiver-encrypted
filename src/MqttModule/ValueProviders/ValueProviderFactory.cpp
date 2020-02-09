@@ -29,6 +29,15 @@ bool ValueProviderFactory::formatMessage(char * message, size_t len, const Pin &
     return provider->formatMessage(message, len, pin);
 }
 
+bool ValueProviderFactory::addJson(JsonDocument & json, const Pin & pin)
+{
+    IValueProvider * provider = getProvider(pin);
+    if (!provider) {
+        return false;
+    }
+    return provider->addJson(json, pin);
+}
+
 bool ValueProviderFactory::apply(const Pin & pin)
 {
     IValueProvider * provider = getProvider(pin);

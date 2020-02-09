@@ -29,9 +29,9 @@ namespace MqttModule
                 *
                 * send heating/nodes/node132/subscribe some-channel
                 *
-                * send heating/nodes/node132/digital/set/5 200 - set default pin time to read and send back to 200 ms. will send back to arduino/digital/5 with data from digitalRead(5)
+                * send heating/nodes/node132/digital/set/5 200 - set default pin time to read and send back to 200 ms. will send back to heating/nodes/node132/digital/5 with data from digitalRead(5)
                 * send sensors/nodes/sam/digital/set/5 1 - will digitalWrite(5, 1) and same as above
-                * send lighting/nodes/sam/analog/set/3 255 - will analogWrite(3, 255) and start sending every DEFAULT_SEND_TIME to arduino/analog/3 with data from analogRead(3)
+                * send lighting/nodes/sam/analog/set/3 255 - will analogWrite(3, 255) and start sending every DEFAULT_SEND_TIME to lighting/nodes/sam/analog/3 with data from analogRead(3)
                 *
                 */
                 void handle(const char * channel, const char * message);

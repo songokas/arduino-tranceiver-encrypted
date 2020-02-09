@@ -3,10 +3,6 @@
 
 #include <Arduino.h>
 
-#ifndef AVAILABLE_PINS
-#define AVAILABLE_PINS {{2, "digital"}}
-#endif
-
 #ifndef NODE_NAME
 #define NODE_NAME __DATE__
 #endif
@@ -16,10 +12,13 @@ const uint8_t MAX_LEN_TOPIC {60};
 // mqtt message
 const uint8_t MAX_LEN_MESSAGE {40};
 
+const uint8_t MAX_LEN_URL {150};
+
 const char CHANNEL_SUBSCRIBE[] PROGMEM {NODE_NAME "/subscribe"};
 const char CHANNEL_INFO[] PROGMEM {NODE_NAME "/%s/%d"};
 const char CHANNEL_SET_JSON[] PROGMEM {NODE_NAME "/set/json"};
 const char CHANNEL_KEEP_ALIVE[] PROGMEM {NODE_NAME "/keep-alive"};
+
 
 const uint16_t DEFAULT_PIN_READ_TIME = 30000;
 const uint8_t MAX_LEN_JSON_MESSAGE {120};

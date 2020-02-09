@@ -17,6 +17,7 @@ namespace MqttModule
                 bool formatMessage(char * message, size_t len, const Pin & pin);
 
                 bool apply(const Pin & pin);
+                bool addJson(JsonDocument & json, const Pin & pin);
         };
     }
 }

@@ -35,7 +35,7 @@ void PinStateJsonHandler::handle(const char * channel, const char * message)
 #ifdef __AVR__
     Serial << F("freeMemory ") << freeMemory() << " " << message << endl;
 #endif
-    DynamicJsonDocument json(MAX_LEN_JSON_MESSAGE);
+    StaticJsonDocument<MAX_LEN_JSON_MESSAGE> json;
     DeserializationError error = deserializeJson(json, message);
     if (error) {
         Serial << F("incorrect json format. ") << error.c_str() << endl;

@@ -6,10 +6,10 @@
 
 using MqttModule::ValueProviders::DallasTemperatureProvider;
 using MqttModule::Pin;
+using MqttModule::ValueProviders::DallasSensor;
 
-DallasTemperatureProvider::DallasTemperatureProvider(DallasTemperature & sensor): sensor(sensor)
+DallasTemperatureProvider::DallasTemperatureProvider(DallasSensor * sensors, uint8_t sensorArrLength): sensors(sensors), sensorArrLength(sensorArrLength)
 {
-
 }
 
 const char * DallasTemperatureProvider::getPinType() const
@@ -19,17 +19,55 @@ const char * DallasTemperatureProvider::getPinType() const
 
 bool DallasTemperatureProvider::formatMessage(char * message, size_t len, const Pin & pin)
 {
-    if (!started) {
-        sensor.begin();
-        started = true;
+    if (!hasSensor(pin.id)) {
+        return false;
     }
-    sensor.requestTemperatures();
-    float temp = sensor.getTempCByIndex(0);
-    snprintf_P(message, len, PSTR("%u"), (uint16_t)(100 * temp));
+    snprintf_P(message, len, PSTR("%u"), getValue(pin.id));
+    return true;
+}
+
+bool DallasTemperatureProvider::addJson(JsonDocument & json, const Pin & pin)
+{
+    if (!hasSensor(pin.id)) {
+        return false;
+    }
+    json[F("temperature")] = getValue(pin.id);
     return true;
 }
 
 bool DallasTemperatureProvider::apply(const Pin & pin)
 {
     return false;
+}
+
+bool DallasTemperatureProvider::hasSensor(uint8_t pin)
+{
+    return getSensor(pin) != nullptr;
+}
+
+DallasSensor * DallasTemperatureProvider::getSensor(uint8_t pin)
+{
+    for (uint8_t i = 0; i < sensorArrLength; i++) {
+        if (sensors[i].pin == pin) {
+            return &sensors[i];
+        }
+    }
+    return nullptr;
+}
+
+uint16_t DallasTemperatureProvider::getValue(uint8_t pin)
+{
+    if (!hasSensor(pin)) {
+        return 0;
+    }
+
+    DallasSensor * reader = getSensor(pin);
+    if (reader->started) {
+        reader->sensor.begin();
+        reader->started = true;
+    }
+
+    reader->sensor.requestTemperatures();
+    float temp = reader->sensor.getTempCByIndex(0);
+    return (uint16_t)(100 * temp); 
 }
