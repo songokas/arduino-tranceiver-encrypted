@@ -12,6 +12,7 @@
 using MqttModule::MqttMessage;
 using MqttModule::MeshMqttClient;
 using MqttModule::SubscriberList;
+using MqttModule::StaticSubscriberList;
 using MqttModule::Subscriber;
 using MqttModule::MessageHandlers::IMessageHandler;
 using RadioEncrypted::IEncryptedMesh;
@@ -36,12 +37,7 @@ TEST_CASE( "MeshMqttClient", "[client]" ) {
     IEncryptedMesh & mesh = meshMock.get();
     IMessageHandler & handler = handlerMock.get();
 
-    IMessageHandler * handlers1[] {nullptr, nullptr};
-    IMessageHandler * handlers2[] {nullptr};
-    uint16_t nodes1[] {0};
-    uint16_t nodes2[] {0};
-    Subscriber subs[] { {handlers1, COUNT_OF(handlers1), nodes1, COUNT_OF(nodes1)}, {handlers2, COUNT_OF(handlers2), nodes2, COUNT_OF(nodes2)}};
-    SubscriberList subscribers (subs, COUNT_OF(subs));
+    StaticSubscriberList<2, 2, 2> subscribers;
     MeshMqttClient client(mesh, subscribers); 
 
     SECTION ("publish full message", "[client]") {

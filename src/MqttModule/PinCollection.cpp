@@ -5,39 +5,29 @@
 
 using MqttModule::PinCollection;
 
-PinCollection::PinCollection(Pin * pins, uint8_t pinArrLength)
-    :pins(pins), pinArrLength(pinArrLength)
-{}
-
 bool PinCollection::set(const Pin & pin)
 {
-    for (uint8_t i = 0; i < pinArrLength; i++) {
-        if (pins[i].id == pin.id) {
-            pins[i].value = pin.value;
-            pins[i].readInterval = pin.readInterval;
-            return true;
-        }
+    Pin * current = getPin(pin.id);
+    if (current) {
+        current->value = pin.value;
+        current->readInterval = pin.readInterval;
+        return true;
     }
     return false;
 }
 
 bool PinCollection::hasAvailablePin(uint8_t id) const
 {
-    for (uint8_t i = 0; i < pinArrLength; i++) {
-        if (pins[i].id == id) {
-            return true;
-        }
-    }
-    return false;
+    return getPin(id) != nullptr;
 }
 
 bool PinCollection::isReadOnly(uint8_t id) const
 {
-    for (uint8_t i = 0; i < pinArrLength; i++) {
-        if (pins[i].id == id) {
-            return pins[i].readOnly;
-        }
+    auto current = getPin(id);
+    if (current) {
+        return current->readOnly;
     }
     return false;
 }
+
 

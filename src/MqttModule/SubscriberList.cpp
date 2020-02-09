@@ -9,16 +9,13 @@
 using MqttModule::Subscriber;
 using MqttModule::SubscriberList;
 
-SubscriberList::SubscriberList(Subscriber * subscribers, uint8_t subscriberArrLength)
-    : subscribers(subscribers), subscriberArrLength(subscriberArrLength)
-{}
-
 Subscriber * SubscriberList::getSubscribed(const char * topic)
 {
     uint32_t crc = CRC32::calculate(topic, strlen(topic));
-    for (uint8_t i = 0; i < subscriberSize; i++) {
-        if (subscribers[i].topicCrc == crc) {
-            return &subscribers[i];
+    for (uint8_t i = 0; i < getSubscriberArrLength(); i++) {
+        auto & subscriber = getSubscriberByIndex(i);
+        if (subscriber.topicCrc == crc) {
+            return &subscriber;
         }
     }
     return nullptr;
@@ -32,10 +29,11 @@ bool SubscriberList::hasSubscribed(const char * topic)
 size_t SubscriberList::call(const MqttMessage & message)
 {
     Subscriber * sub = getSubscribed(message.topic);
-    size_t i {0};
+    uint8_t i {0};
     while (sub && i < sub->handlerSize) {
-        if (sub->handlers[i]) {
-            sub->handlers[i]->handle(message.topic, message.message);
+        auto handler = sub->getHandler(i);
+        if (handler) {
+            handler->handle(message.topic, message.message);
         }
         i++;
     }
@@ -47,37 +45,28 @@ bool SubscriberList::add(const char * topic, IMessageHandler * handler, uint16_t
 
     Subscriber * sub = getSubscribed(topic);
     if (sub == nullptr) {
-        if (subscriberSize >= subscriberArrLength) {
+        if (subscriberSize >= getSubscriberArrLength()) {
             return false;
         }
 
         uint32_t crc = CRC32::calculate(topic, strlen(topic));
-        subscribers[subscriberSize].topicCrc = crc;
-        subscribers[subscriberSize].handlers[0] = handler;
-        subscribers[subscriberSize].nodes[0] = nodeId;
-        subscribers[subscriberSize].handlerSize++;
+        auto & subscriber = getSubscriberByIndex(subscriberSize);
+        subscriber.topicCrc = crc;
+        subscriber.addHandler(handler, nodeId);
         subscriberSize++;
         return true;
     }
 
     bool handlerAdded = false;
-    if (!hasHandler(topic, handler)) {
-        sub->handlers[sub->handlerSize] = handler;
-        sub->handlerSize++;
+    if (!sub->hasHandler(handler)) {
+        sub->addHandler(handler, nodeId);
         handlerAdded = true;
     }
 
-    if (hasNode(*sub, nodeId)) {
+    if (sub->hasNode(nodeId)) {
         return handlerAdded;
-    }
-    
-    for (uint8_t i = 0; i < sub->nodeArrLength; i++) {
-        if (sub->nodes[i] == 0) {
-            sub->nodes[i] = nodeId;
-            return true;
-        }
-    }
-    return false;
+    } 
+    return sub->addNode(nodeId);
 }
 
 size_t SubscriberList::countSubscribers() const
@@ -96,28 +85,7 @@ size_t SubscriberList::countHandlers(const char * topic)
 
 bool SubscriberList::hasHandler(const char * topic, IMessageHandler * handler)
 {
-    size_t i {0};
     Subscriber * sub = getSubscribed(topic);
-    while (sub && i < sub->handlerSize) {
-        if (sub->handlers[i] == handler) {
-            return true;
-        }
-        i++;
-    }
-    return false;
+    return sub && sub->hasHandler(handler);
 }
 
-bool SubscriberList::hasNode(const Subscriber & subscriber, uint16_t nodeId)
-{
-    for (uint8_t i = 0; i < subscriber.nodeArrLength; i++) {
-        if (subscriber.nodes[i] == nodeId) {
-            return true;
-        }
-    }
-   return false;
-}
-
-const Subscriber * SubscriberList::getSubscriber(const char * topic)
-{
-    return getSubscribed(topic);
-}
