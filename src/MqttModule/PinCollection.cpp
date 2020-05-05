@@ -1,7 +1,8 @@
 #include <Arduino.h>
 
-#include "PinCollection.h"
 #include "MqttConfig.h"
+#include "MqttMessage.h"
+#include "PinCollection.h"
 
 using MqttModule::PinCollection;
 
@@ -10,7 +11,7 @@ bool PinCollection::set(const Pin & pin)
     Pin * current = getPin(pin.id);
     if (current) {
         current->value = pin.value;
-        current->readInterval = pin.readInterval;
+        current->changed = pin.changed;
         return true;
     }
     return false;

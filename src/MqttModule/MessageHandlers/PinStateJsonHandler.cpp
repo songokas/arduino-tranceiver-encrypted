@@ -1,15 +1,11 @@
 #include <Arduino.h>
-#include <Streaming.h>
 #include <ArduinoJson.h>
 
-#ifdef __AVR__
-#include <MemoryFree.h>
-#endif
-
+#include "CommonModule/MacroHelper.h"
 #include "PinStateJsonHandler.h"
 #include "../MqttConfig.h"
+#include "../MqttMessage.h"
 #include "../PinCollection.h"
-#include "../NodeHelpers.h"
 #include "../ValueProviders/ValueProviderFactory.h"
 
 using MqttModule::ValueProviders::ValueProviderFactory;
@@ -32,25 +28,22 @@ PinStateJsonHandler::PinStateJsonHandler(
 */
 void PinStateJsonHandler::handle(const char * channel, const char * message)
 {
-#ifdef __AVR__
-    Serial << F("freeMemory ") << freeMemory() << " " << message << endl;
-#endif
     StaticJsonDocument<MAX_LEN_JSON_MESSAGE> json;
     DeserializationError error = deserializeJson(json, message);
     if (error) {
-        Serial << F("incorrect json format. ") << error.c_str() << endl;
+        error("incorrect json format: %s", error.c_str());
         return;
     }
     if (!json.is<JsonObject>()) {
-        Serial << F("incorrect json format. should be: {pin:3, set:3}") << endl;
+        error("incorrect json format. should be: {pin:3, set:3}");
         return;
     }
 
     uint8_t id = assignPin(json.as<JsonObject>());
     if (id > 0) {
-        Serial << F("Pin updated: ") << id << endl;
+        debug("Pin updated: %d", id);
     } else {
-        Serial << F("Pin update failed") << endl;
+        error("Json handler pin update failed");
     }
 }
 
@@ -74,14 +67,15 @@ uint8_t PinStateJsonHandler::assignPin(const JsonObject & json)
         pinType,
         json[F("set")].is<uint16_t>() ? json[F("set")].as<uint16_t>() : 0,
         false,
-        json[F("readInterval")].is<uint16_t>() ? json[F("readInterval")].as<uint16_t>() : DEFAULT_PIN_READ_TIME
+        true
+        //json[F("readInterval")].is<uint16_t>() ? json[F("readInterval")].as<uint16_t>() : DEFAULT_PIN_READ_TIME
     };
 
     pins.set(pin);
 
     if (json[F("set")].is<uint16_t>() && !pins.isReadOnly(id)) {
         if (!valueProviderFactory.apply(pin)) {
-            Serial << F("Value not applied: ") << pin.id << endl;
+            warning("Value not applied: %d", pin.id);
         }
     }
     return pin.id;

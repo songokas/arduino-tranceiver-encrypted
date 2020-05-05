@@ -2,6 +2,7 @@
 #include <OneWire.h>
 #include <DallasTemperature.h>
 #include "../MqttConfig.h"
+#include "../MqttMessage.h"
 #include "DallasTemperatureProvider.h"
 
 using MqttModule::ValueProviders::DallasTemperatureProvider;

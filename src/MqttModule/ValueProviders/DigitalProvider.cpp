@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include "../MqttConfig.h"
+#include "../MqttMessage.h"
 
 #include "DigitalProvider.h"
 

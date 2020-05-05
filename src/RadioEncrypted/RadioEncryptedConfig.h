@@ -3,13 +3,25 @@
 
 #include <Arduino.h>
 
-const uint8_t VECTOR_LENGH {16};
-const uint8_t MAX_LEN_ENCRYPTED_MESSAGE {6};
-const uint8_t MAX_TAG_LENGH {5};
+#ifndef NRF_RADIO_CHANNEL
+#define NRF_RADIO_CHANNEL 102
+#endif
+#ifndef ENCRYPTION_MAX_USER_DATA_LENGTH
+#define ENCRYPTION_MAX_USER_DATA_LENGTH 6
+#endif
+#ifndef ENCRYPTION_MAX_TAG_LENGTH
+#define ENCRYPTION_MAX_TAG_LENGTH 5
+#endif
 
-const uint8_t KEY_LENGH {16};
+const uint8_t ENCRYPTION_CIPHER_LENGTH {ENCRYPTION_MAX_USER_DATA_LENGTH};
+const uint8_t ENCRYPTION_VECTOR_LENGTH {16};
+const uint8_t ENCRYPTION_TAG_LENGTH {ENCRYPTION_MAX_TAG_LENGTH};
+const uint8_t ENCRYPTION_KEY_LENGTH {16};
 
 const uint16_t MESH_TIMEOUT {5000};
-const uint8_t RADIO_CHANNEL {102};
+
+const uint8_t RADIO_CHANNEL {NRF_RADIO_CHANNEL};
+
+#include "Message.h"
 
 #endif

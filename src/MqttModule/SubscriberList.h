@@ -23,6 +23,8 @@ namespace MqttModule
             virtual bool hasNode(uint16_t node) const = 0;
             virtual bool addNode(uint16_t node) = 0;
             virtual IMessageHandler * getHandler(uint8_t i) = 0;
+            virtual uint16_t getNodeByIndex(uint8_t i) const = 0;
+            virtual uint8_t getNodeArrLength() const = 0;
 
     };
 
@@ -34,6 +36,8 @@ namespace MqttModule
             bool addNode(uint16_t node) { for (uint16_t & current: nodes) { if (current == 0) { current = node; return true; }} return false; }
             bool hasHandler(IMessageHandler * handler) const { for (IMessageHandler * current: handlers) { if (current == handler) { return true; }} return false;}
             bool hasNode(uint16_t node) const { for (uint16_t current: nodes) { if (current == node) { return true; }} return false; }
+            uint16_t getNodeByIndex(uint8_t i) const { if (i >= maxNodes) { return 0; } return nodes[i]; }
+            uint8_t getNodeArrLength() const { return maxNodes; }
         
             IMessageHandler * getHandler(uint8_t i) { return i >= maxHandlers ? handlers[maxHandlers - 1] : handlers[i]; }
         
@@ -52,6 +56,7 @@ namespace MqttModule
             size_t countSubscribers() const;
             size_t countHandlers(const char * topic);
             bool hasHandler(const char * topic, IMessageHandler * handler);
+            Subscriber * getSubscribed(const char * topic);
 
         protected:
             virtual uint8_t getSubscriberArrLength() const = 0;
@@ -60,7 +65,6 @@ namespace MqttModule
 
         private:
             bool hasNode(const Subscriber & subscriber, uint16_t nodeId);
-            Subscriber * getSubscribed(const char * topic);
             uint8_t subscriberSize {0};
    
     };

@@ -6,12 +6,14 @@
 #include <Acorn128.h>
 
 #include "CommonModule/MacroHelper.h"
+#include "RadioEncrypted/RadioEncryptedConfig.h"
 #include "RadioEncrypted/Entropy/IEntropy.h"
 #include "RadioEncrypted/Encryption.h"
 
 using RadioEncrypted::Entropy::IEntropy;
 using RadioEncrypted::Encryption;
 using RadioEncrypted::EncryptedMessage;
+
 
 using namespace fakeit;
 

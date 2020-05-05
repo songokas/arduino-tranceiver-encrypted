@@ -15,16 +15,15 @@ Encryption::Encryption(Acorn128 & cipher, const char * key, IEntropy & entropy)
 {
 }
 
-bool Encryption::setupCipher(const uint8_t (&initVector)[VECTOR_LENGH], const void * authData, size_t authLen)
+bool Encryption::setupCipher(const uint8_t (&initVector)[ENCRYPTION_VECTOR_LENGTH], const void * authData, size_t authLen)
 {
     cipher.clear();
     if (!cipher.setKey((uint8_t*)key, strlen(key))) {
-        DPRINT(F("Encryption key must be 16 bytes long. Provided "));
-        DPRINTLN(strlen(key) + 1);
+        error("Encryption key must be 16 bytes long. Provided %d", strlen(key) + 1);
         return false;
     }
     if (!cipher.setIV(initVector, COUNT_OF(initVector))) {
-        DPRINTLN(F("Encryption setIV failed"));
+        error("Encryption setIV failed");
         return false;
     }
 
@@ -58,7 +57,7 @@ bool Encryption::decrypt(const void * authData, size_t authLen, const EncryptedM
     cipher.decrypt((uint8_t *)data, message.cipherText, MIN(len, COUNT_OF(message.cipherText)));
 
     if (!cipher.checkTag(message.tag, COUNT_OF(message.tag))) {
-        DPRINTLN(F("Tag check failed ... "));
+        warning("Tag check failed ... ");
         return false;
     }
 

@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <Streaming.h>
 #include "../MqttConfig.h"
+#include "../MqttMessage.h"
 #include "ValueProviderFactory.h"
 
 using MqttModule::ValueProviders::ValueProviderFactory;

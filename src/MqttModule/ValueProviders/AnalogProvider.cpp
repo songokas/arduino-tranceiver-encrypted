@@ -1,6 +1,7 @@
 #include <Arduino.h>
 
 #include "../MqttConfig.h"
+#include "../MqttMessage.h"
 #include "AnalogProvider.h"
 
 using MqttModule::ValueProviders::AnalogProvider;

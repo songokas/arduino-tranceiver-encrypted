@@ -42,8 +42,9 @@ bool MeshMqttClient::publish(const char * topic, const char * msg)
 bool MeshMqttClient::subscribe(const char * topic, IMessageHandler * handler)
 {
     subscribers.add(topic, handler, mesh.getNodeId());
-    MqttMessage message(topic);
-    return mesh.send(&message, sizeof(message), (uint8_t)MessageType::Subscribe, toNodeId);
+    return true;
+    //MqttMessage message(topic);
+    //return mesh.send(&message, sizeof(message), (uint8_t)MessageType::Subscribe, toNodeId);
 }
 
 size_t MeshMqttClient::loop()
@@ -55,11 +56,11 @@ size_t MeshMqttClient::loop()
         if (mesh.receive(&message, sizeof(message), (uint8_t)MessageType::All, header)) {
             message.topic[COUNT_OF(message.topic) - 1] = '\0';
             message.message[COUNT_OF(message.message) - 1] = '\0';
-            DPRINT(F("Mqtt received: ")); DPRINTLN(message.message);
+            debug("Mqtt received: %s", message.message);
             subscribers.call(message);
             i++;
         } else {
-            DPRINTLN(F("Mqtt failed to read message"));
+            error("Mqtt failed to read message");
         }
 
     }

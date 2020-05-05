@@ -12,15 +12,6 @@ namespace RadioEncrypted
 
     using Entropy::IEntropy;
 
-#pragma pack (1)
-    struct EncryptedMessage
-    {
-        uint8_t nonce[VECTOR_LENGH] {0};
-        uint8_t cipherText[MAX_LEN_ENCRYPTED_MESSAGE] {0};
-        uint8_t tag[MAX_TAG_LENGH] {0};
-    };
-#pragma pack (0)
-
     class Encryption
     {
         public:
@@ -29,7 +20,7 @@ namespace RadioEncrypted
             bool decrypt(const void * authData, size_t authLen, const EncryptedMessage & message, void * data, size_t len);
             bool randomBytes(uint8_t * bytes, size_t len);
         private:
-            bool setupCipher(const uint8_t (&initVector)[VECTOR_LENGH], const void * authDat, size_t authLen);
+            bool setupCipher(const uint8_t (&initVector)[ENCRYPTION_VECTOR_LENGTH], const void * authDat, size_t authLen);
             Acorn128 & cipher;
             const char * key;
             IEntropy & entropy;

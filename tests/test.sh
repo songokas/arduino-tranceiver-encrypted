@@ -9,7 +9,7 @@ fi
 cd build
 
 mockPath="../Mocks/";
-options="-c -g -std=c++14"
+options="-c -g -std=c++14 -DDEBUG_LEVEL=0 -DMQTT_CLIENT_NAME=\"test1\""
 srcPath="../../src"
 libPath="../../libs"
 testPath="../"
@@ -42,6 +42,7 @@ g++ $mocksOptions $libOptions $options $libPath/CRC32/src/CRC32.cpp
 g++ $fullOptions $options $testPath/MqttModule/SubscriberListTest.cpp
 g++ $fullOptions $options $testPath/RadioEncrypted/EncryptionTest.cpp
 g++ $fullOptions $options $testPath/MqttModule/MeshMqttClientTest.cpp
+g++ $fullOptions $options $testPath/CommonModule/StringHelperTest.cpp
 
 if [[ -f test ]]; then
     rm test

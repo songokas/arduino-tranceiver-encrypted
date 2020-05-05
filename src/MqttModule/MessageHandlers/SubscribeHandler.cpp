@@ -1,6 +1,6 @@
 #include <Arduino.h>
-#include <Streaming.h>
 
+#include "CommonModule/MacroHelper.h"
 #include "SubscribeHandler.h"
 #include "../MeshMqttClient.h"
 
@@ -12,8 +12,8 @@ SubscribeHandler::SubscribeHandler(MeshMqttClient & client, IMessageHandler & ha
 void SubscribeHandler::handle(const char * topic, const char * message)
 {
     if (!client.subscribe(message, &handler)) {
-        Serial << F("Failed to register subscription") << endl;
+        error("Failed to register subscription");
     } else {
-        Serial << F("Subscribed for: ") << message << endl;
+        debug("Subscribed for: %s", message);
     }
 }

@@ -1,7 +1,7 @@
 #include <Arduino.h>
-#include <Streaming.h>
 #include <PubSubClient.h>
 
+#include "CommonModule/MacroHelper.h"
 #include "SubscribePubSubHandler.h"
 #include "../SubscriberList.h"
 
@@ -17,8 +17,8 @@ void SubscribePubSubHandler::handle(const char * topic, const char * message)
 {
     if (client.subscribe(message)) {
         subscribers.add(message, &handler, (uint16_t)0);
-        Serial << F("Failed to register subscription") << endl;
+        debug("Subscribed for: %s", message);
     } else {
-        Serial << F("Subscribed for: ") << message << endl;
+        debug("Failed to register subscription");
     }
 }

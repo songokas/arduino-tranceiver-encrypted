@@ -1,16 +1,18 @@
 #include <Arduino.h>
-#include <Streaming.h>
 
+#include "CommonModule/StringHelper.h"
+#include "CommonModule/MacroHelper.h"
 #include "PinStateHandler.h"
 #include "../MqttConfig.h"
+#include "../MqttMessage.h"
 #include "../PinCollection.h"
-#include "../NodeHelpers.h"
 #include "../ValueProviders/ValueProviderFactory.h"
 
 using MqttModule::MessageHandlers::PinStateHandler;
 using MqttModule::ValueProviders::ValueProviderFactory;
 using MqttModule::Pin;
 using MqttModule::PinCollection;
+using CommonModule::findPosFromEnd;
 
 PinStateHandler::PinStateHandler(
     PinCollection & pins,
@@ -29,24 +31,24 @@ void PinStateHandler::handle(const char * channel, const char * message)
     uint16_t idPos = findPosFromEnd(channel, strlen(channel), '/');
     uint8_t id = atoi(channel + idPos + 1);
     if (!id) {
-        Serial << F("Channel id missing: ") << channel << endl;
+        error("Channel id missing: %s", channel);
         return;
     }
 
     if (pins.hasAvailablePin(id)) {
-        Serial << F("No available pins for: ") << channel << endl;
+        error("No available pins for: %s", channel);
         return;
     }
 
     uint16_t typePos = findPosFromEnd(channel, idPos - 1, '/');
     if (!typePos) {
-        Serial << F("Channel input type missing: ") << channel << endl;
+        error("Channel input type missing: %s", channel);
         return;
     }
 
     uint16_t operationPos = findPosFromEnd(channel, typePos - 1, '/');
     if (!operationPos) {
-        Serial << F("Channel operation missing: ") << channel << endl;
+        error("Channel operation missing: %s", channel);
         return;
     }
 
@@ -57,12 +59,12 @@ void PinStateHandler::handle(const char * channel, const char * message)
     const char * pinType = valueProviderFactory.getMatchingPinType(channel + typePos + 1, 6);
     uint16_t value = atoi(message);
 
-    Pin pin {id, pinType, isSetOperation ? value : 0, false, isReadOperation ? value : DEFAULT_PIN_READ_TIME, 0};
+    Pin pin {id, pinType, isSetOperation ? value : 0, false, true};//`isReadOperation ? value : DEFAULT_PIN_READ_TIME, 0};
     pins.set(pin);
 
     if (isSetOperation && !pins.isReadOnly(id)) {
         if (!valueProviderFactory.apply(pin)) {
-            Serial << F("Value not applied: ") << channel << endl;
+            warning("Pin state handler value not applied: %s", channel);
         }
     }
 }

@@ -1,4 +1,6 @@
+#ifdef __AVR__
 #include <avr/wdt.h>
+#endif
 #include <RF24.h>
 #include <RF24Mesh.h>
 #include <Crypto.h>
@@ -8,9 +10,13 @@
 #include "CommonModule/MacroHelper.h"
 #include "Encryption.h"
 #include "EncryptedRadio.h"
+#include "Helpers.h"
 
 using RadioEncrypted::Encryption;
 using RadioEncrypted::EncryptedRadio;
+using RadioEncrypted::EncryptedMessage;
+using RadioEncrypted::MeshAuth;
+using RadioEncrypted::RadioEncryptedMessage;
 
 EncryptedRadio::EncryptedRadio(uint8_t nodeId, RF24 & radio, Encryption & encryption)
     :nodeId(nodeId), radio(radio), encryption(encryption)
@@ -19,28 +25,29 @@ EncryptedRadio::EncryptedRadio(uint8_t nodeId, RF24 & radio, Encryption & encryp
 bool EncryptedRadio::send(const void * data, size_t len, uint8_t messageType, uint16_t toNodeId, uint8_t retries, uint16_t fallBackNode)
 {
     if  (isAvailable()) {
-        DPRINTLN(F("Packet is available. Read it first"));
+        error("Packet is available. Read it first");
         return false;
     }
     EncryptedMessage message;
     if (!encryption.randomBytes(message.nonce, COUNT_OF(message.nonce))) {
-        DPRINTLN(F("Failed to create random bytes"));
+        error("Failed to create random bytes");
         return false;
     }
 
     MeshAuth auth {getNodeId(), toNodeId, messageType};
-    encryption.encrypt(data, len, &auth, sizeof(auth), message);
+    if (!encryption.encrypt(data, len, &auth, sizeof(auth), message)) {
+        error("Failed to encrypt data");
+        return false;
+    }
 
     RadioEncryptedMessage radioMessage { auth, message };
 
     #ifdef DEBUG_NETWORK
-        DPRINTLN(F("Send encrypted message"));
+        debug("Send encrypted message"));
         printBytes(&radioMessage, sizeof(radioMessage));
-        DPRINTLN(F("Auth header"));
+        debug("Auth header"));
         printBytes(&auth, sizeof(auth));
-        DPRINTLN(auth.fromNode);
-        DPRINTLN(auth.toNode);
-        DPRINTLN(auth.messageType);
+        debug("%d %d %d", auth.fromNode, auth.toNode, auth.messageType);
     #endif
 
     bool result = sendToNode(radioMessage, toNodeId);
@@ -53,10 +60,10 @@ bool EncryptedRadio::send(const void * data, size_t len, uint8_t messageType, ui
 bool EncryptedRadio::sendToNode(const RadioEncryptedMessage & radioMessage, uint16_t toNode, uint8_t retries)
 {
     radio.stopListening();
-    uint8_t address[6] = {toNode, 0, 0, 0, 0, 0};
+    uint8_t address[6] = {toNode & 0xff, (toNode >> 8), 0, 0, 0, 0};
     radio.openWritingPipe(address);
 	while (retries > 0) {
-	    wdt_reset();
+	    resetWatchDog();
 	    if (radio.write(&radioMessage, sizeof(radioMessage))) {
             radio.startListening();
             return true;
@@ -74,7 +81,7 @@ bool EncryptedRadio::receive(void * data, size_t len, uint8_t messageType, RF24N
     RadioEncryptedMessage radioMessage;
     radio.read(&radioMessage, sizeof(radioMessage));
     if (radioMessage.header.fromNode < 0) {
-        DPRINTLN(F("Cant verify node id in network"));
+        error("Cant verify node id in network");
         return false;
     }
 
@@ -83,14 +90,14 @@ bool EncryptedRadio::receive(void * data, size_t len, uint8_t messageType, RF24N
     header.type = radioMessage.header.messageType;
 
     if (radioMessage.header.toNode != nodeId) {
-        DPRINT(F("Forward to node ")); DPRINTLN(radioMessage.header.toNode);
+        info("Forward to node %d", radioMessage.header.toNode);
         return sendToNode(radioMessage, radioMessage.header.toNode);
     }
 
     if (encryption.decrypt(&radioMessage.header, sizeof(radioMessage.header), radioMessage.message, data, len)) {
         return true;
     }
-    DPRINTLN(F("Failed to decrypt message"));
+    error("Failed to decrypt message");
     return false;
 }
 
@@ -110,12 +117,10 @@ void EncryptedRadio::printBytes(void * message, size_t length)
     char *byteArray = (char *) message;
     char tmp[16];
     for(size_t i = 0; i < length; ++i){	
-        //DPRINT(byte, HEX);
         sprintf(tmp, "0x%.2X", byteArray[i]); 
-        DPRINT(tmp);
+        debug(tmp);
     }
-    DPRINTLN("");
-    DPRINTLN(length);
+    debug("%d", length);
 }
 
 #endif

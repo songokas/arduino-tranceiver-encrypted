@@ -12,16 +12,6 @@ namespace RadioEncrypted
 {
     class Encryption;
 
-#pragma pack (1)
-    struct RadioEncryptedMessage
-    {
-        MeshAuth header {0, 0, 0};
-        EncryptedMessage message {};
-        RadioEncryptedMessage() {}
-        RadioEncryptedMessage(const MeshAuth & header, const EncryptedMessage & message): header(header), message(message) {}
-    };
-#pragma pack (0)
-
     class EncryptedRadio: public IEncryptedMesh
     {
         public:
