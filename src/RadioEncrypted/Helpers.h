@@ -145,8 +145,11 @@ namespace RadioEncrypted
 #endif
 #ifdef WIFICLIENTMULTI_H_
 
-    inline bool connectToWifi(ESP8266WiFiMulti wifi, uint8_t retries = 10)
+    inline bool connectToWifi(ESP8266WiFiMulti & wifi, uint8_t retries = 10)
     {
+        if (wifi.run() == WL_CONNECTED) {
+            return true;
+        }
         info("Wait for WiFi... ");
         uint16_t wifiAttempts = 0;
         while (wifi.run() != WL_CONNECTED) {
@@ -158,6 +161,7 @@ namespace RadioEncrypted
                 return false;
             }
         }
+        Serial.println();
         info("Wifi connected.");// IP address: %s", WiFi.localIP().toString());
         return true;
     }
