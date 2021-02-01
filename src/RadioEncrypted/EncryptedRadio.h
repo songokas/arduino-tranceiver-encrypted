@@ -17,7 +17,7 @@ namespace RadioEncrypted
         public:
             EncryptedRadio(uint8_t nodeId, RF24 & radio, Encryption & encryption);
             bool send(const void * data, size_t len, uint8_t messageType, uint16_t toNode = 0, uint8_t retries = 5, uint16_t fallbackNode = 0);
-            bool receive(void * data, size_t len, uint8_t messageType, RF24NetworkHeader & header, uint8_t expectFromAddress = 0);
+            bool receive(void * data, size_t len, uint8_t messageType, RF24NetworkHeader & header, uint16_t expectFromAddress = 0);
             bool isAvailable();
             uint16_t getNodeId();
 

@@ -100,12 +100,15 @@ namespace RadioEncrypted
     }
 #endif
 #ifdef PubSubClient_h
+
+    #include "../MqttModule/MqttConfig.h"
+
     inline bool sendLiveData(PubSubClient & client)
     {
         char topic[sizeof(CHANNEL_KEEP_ALIVE)] {0};
         snprintf_P(topic, COUNT_OF(topic), CHANNEL_KEEP_ALIVE);
         char liveMsg[16] {0};
-        sprintf(liveMsg, "%d", millis());
+        sprintf(liveMsg, "%lu", millis());
         if (!client.publish(topic, liveMsg)) {
             error("Failed to publish keep alive");
             return false;
