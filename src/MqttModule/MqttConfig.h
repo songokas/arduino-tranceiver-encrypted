@@ -8,7 +8,7 @@
 #endif
 
 #ifndef MQTT_MAX_MESSAGE_LENGTH
-#define MQTT_MAX_MESSAGE_LENGTH 40
+#define MQTT_MAX_MESSAGE_LENGTH 160
 #endif
 
 const uint8_t MQTT_MAX_LEN_TOPIC {MQTT_MAX_TOPIC_LENGTH};
@@ -23,6 +23,6 @@ const char CHANNEL_KEEP_ALIVE[] PROGMEM {MQTT_CLIENT_NAME "/keep-alive"};
 const char CHANNEL_MQTT_TO_NRF_NETWORK[] PROGMEM {"nrfNetwork/#"};
 
 const uint16_t DEFAULT_PIN_READ_TIME = 30000;
-const uint8_t MAX_LEN_JSON_MESSAGE {120};
+const uint8_t MAX_LEN_JSON_MESSAGE {255};
 
 #endif

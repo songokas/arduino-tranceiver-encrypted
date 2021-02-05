@@ -9,6 +9,8 @@
 #define DEBUG_LEVEL 1
 #endif
 
+#if ARDUINO
+
 inline void serialPrintf(HardwareSerial &serial, const char *fmt, ...)
 {
     va_list argv;
@@ -79,7 +81,9 @@ inline void serialPrintf(HardwareSerial &serial, const char *fmt, ...)
     va_end(argv);
 }
 
-#if DEBUG_LEVEL > 0
+#endif
+
+#if DEBUG_LEVEL > 0 && ARDUINO
 #define LOG(level, levelName, message, ...)                  \
     if (level >= DEBUG_LEVEL)                                \
     {                                                        \
